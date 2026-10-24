@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniBudget - Student Budget Tracker</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-brand" id="brandLogo">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-title">
+        <span>UniBudget</span>
+        <span class="brand-subtitle">Student Tracker</span>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <!-- Month Filter (Visible when authenticated) -->
+      <div class="month-picker" id="navMonthContainer" style="display: none;">
+        <span>📅</span>&nbsp;
+        <input type="month" id="selectedMonth" title="Select budget month">
+      </div>
+
+      <!-- Theme Switcher -->
+      <button class="btn-icon" id="themeToggleBtn" title="Toggle Light / Dark Mode">
+        <span id="themeIcon">🌙</span>
+      </button>
+
+      <!-- Authenticated User Menu -->
+      <div id="navUserMenu" style="display: none; align-items: center; gap: 0.75rem;">
+        <button class="btn btn-primary btn-sm" id="navAddExpenseBtn">
+          <span>+</span> Add Expense
+        </button>
+
+        <div class="user-badge" id="userProfileBtn" title="View & Edit Student Profile">
+          <div class="user-avatar" id="navUserAvatar">AR</div>
+          <div class="user-details">
+            <span class="user-name" id="navUserName">Alex Rivers</span>
+            <span class="user-school" id="navUserSchool">Metropolis Univ</span>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" id="logoutBtn" title="Log Out">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App Wrapper -->
+  <main class="main-wrapper">
+
+    <!-- ================= AUTH VIEW ================= -->
+    <section id="authSection" class="auth-container">
+      <div class="auth-card">
+        <!-- Hero Left Side -->
+        <div class="auth-hero">
+          <div class="auth-hero-header">
+            <h2>Take Control of Your College Budget.</h2>
+            <p>Track tuition, textbooks, dorm rent, and late-night study snacks without running out before finals.</p>
+          </div>
+          <ul class="hero-features">
+            <li class="hero-feature-item">
+              <span>🎯</span> <strong>Pacing Intelligence:</strong> Know your safe daily spend limit every single day.
+            </li>
+            <li class="hero-feature-item">
+              <span>💡</span> <strong>Can I Afford It?:</strong> Calculate hours of campus work before impulse buying.
+            </li>
+            <li class="hero-feature-item">
+              <span>📊</span> <strong>Visual Analytics:</strong> Category doughnut charts and budget vs actual comparisons.
+            </li>
+            <li class="hero-feature-item">
+              <span>🎓</span> <strong>Student Categories:</strong> Custom-built for books, meal plans, bus passes, and housing.
+            </li>
+          </ul>
+          <div class="auth-hero-footer">
+            Designed for college students & undergraduates worldwide.
+          </div>
+        </div>
+
+        <!-- Form Right Side -->
+        <div class="auth-form-side">
+          <!-- Demo 1-Click Login Button -->
+          <button class="btn btn-demo" id="demoLoginBtn" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; margin-bottom: 1.25rem;">
+            <span>⚡</span> One-Click Demo Student Login
+          </button>
+          
+          <div class="auth-divider">
+            <span>or sign in with credentials</span>
+          </div>
+
+          <!-- Auth Tabs -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tabLoginBtn">Log In</button>
+            <button class="auth-tab" id="tabRegisterBtn">Create Account</button>
+          </div>
+
+          <!-- Login Form -->
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">Student Email</label>
+              <input type="email" id="loginEmail" class="form-control" placeholder="alex@student.edu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+              Sign In to Dashboard
+            </button>
+          </form>
+
+          <!-- Register Form -->
+          <form id="registerForm" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="regName">Full Name</label>
+              <input type="text" id="regName" class="form-control" placeholder="Alex Rivers" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regEmail">Student Email</label>
+              <input type="email" id="regEmail" class="form-control" placeholder="alex@university.edu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regPassword">Password (6+ chars)</label>
+              <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required minlength="6">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="regUniversity">University / College</label>
+                <input type="text" id="regUniversity" class="form-control" placeholder="State University">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="regMajor">Major / Year</label>
+                <input type="text" id="regMajor" class="form-control" placeholder="Computer Science">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="regBudget">Monthly Budget</label>
+                <input type="number" id="regBudget" class="form-control" value="1200" step="10" min="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="regCurrency">Currency</label>
+                <select id="regCurrency" class="form-control">
+                  <option value="$" selected>$ (USD)</option>
+                  <option value="€">€ (EUR)</option>
+                  <option value="£">£ (GBP)</option>
+                  <option value="₹">₹ (INR)</option>
+                  <option value="C$">C$ (CAD)</option>
+                  <option value="A$">A$ (AUD)</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+              Create Student Account
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <section id="dashboardSection" style="display: none;">
+
+      <!-- Status & Health Alert Banner -->
+      <div class="status-banner" id="statusBanner">
+        <div class="status-content">
+          <div class="status-icon-circle" id="statusIcon">🛡️</div>
+          <div class="status-texts">
+            <h3 id="statusHeading">Budget Pacing: On Track</h3>
+            <p id="statusDescription">Calculating current pacing and daily allowance...</p>
+          </div>
+        </div>
+        <div class="status-actions">
+          <button class="btn btn-secondary btn-sm" id="openAffordabilityBtn">
+            <span>🎯</span> Can I Afford It?
+          </button>
+          <button class="btn btn-secondary btn-sm" id="exportCsvBtn">
+            <span>📥</span> Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Metrics Cards Grid -->
+      <div class="metrics-grid">
+        <!-- Monthly Budget -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Monthly Budget</span>
+            <div class="metric-icon-box" style="background: var(--primary-light); color: var(--primary);">💰</div>
+          </div>
+          <div class="metric-value" id="cardMonthlyBudget">$0.00</div>
+          <div class="progress-container">
+            <div class="progress-bar" id="cardBudgetProgress" style="width: 0%; background: var(--primary);"></div>
+          </div>
+          <div class="metric-footer">
+            <span id="cardSpentPercent">0% utilized</span>
+            <a href="javascript:void(0)" id="cardEditBudgetLink" style="color: var(--primary); text-decoration: none; font-weight: 600;">Edit Limit</a>
+          </div>
+        </div>
+
+        <!-- Total Spent -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Spent</span>
+            <div class="metric-icon-box" style="background: var(--warning-bg); color: var(--warning);">📉</div>
+          </div>
+          <div class="metric-value" id="cardTotalSpent">$0.00</div>
+          <div class="progress-container">
+            <div class="progress-bar" id="cardSpendVelocityBar" style="width: 50%; background: var(--warning);"></div>
+          </div>
+          <div class="metric-footer">
+            <span id="cardTxCount">0 expenses</span>
+            <span id="cardAvgDaily">Avg: $0.00/day</span>
+          </div>
+        </div>
+
+        <!-- Remaining Balance -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Remaining Balance</span>
+            <div class="metric-icon-box" id="cardRemainingIconBox" style="background: var(--success-bg); color: var(--success);">🛡️</div>
+          </div>
+          <div class="metric-value" id="cardRemainingBalance">$0.00</div>
+          <div class="progress-container">
+            <div class="progress-bar" id="cardRemainingProgressBar" style="width: 100%; background: var(--success);"></div>
+          </div>
+          <div class="metric-footer">
+            <span id="cardDaysLeft">0 days remaining</span>
+            <span class="badge badge-success" id="cardStatusBadge">Healthy</span>
+          </div>
+        </div>
+
+        <!-- Safe Daily Spend -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Safe Daily Spend</span>
+            <div class="metric-icon-box" style="background: var(--info-bg); color: var(--info);">⏱️</div>
+          </div>
+          <div class="metric-value" id="cardSafeDaily">$0.00</div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 100%; background: var(--info);"></div>
+          </div>
+          <div class="metric-footer">
+            <span>Recommended daily ceiling</span>
+            <span style="font-weight: 600; color: var(--info);">Pacing metric</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section Row 1 -->
+      <div class="dashboard-grid">
+        <!-- Chart 1: Category Doughnut -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🥧</span> Spending by Category
+            </div>
+            <span class="badge badge-info" id="chartCategoryCount">0 Active</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas id="categoryDoughnutChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 2: Spending Velocity / Daily Trend -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📈</span> Daily Spending Velocity
+            </div>
+            <span class="badge badge-warning" id="chartTrendLabel">This Month</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas id="spendingTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section Row 2 -->
+      <div class="dashboard-grid">
+        <!-- Chart 3: Budget vs Actual per Category -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📊</span> Budget Cap vs. Actual Spent
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Top Categories</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas id="budgetVsActualChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 4: Payment Methods Distribution -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>💳</span> Payment Methods
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Campus Card, Debit, Cash</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas id="paymentMethodChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Expense Categories Section -->
+      <section class="categories-container">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Student Expense Categories</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Track specific college spending caps (rent, books, food, transit)</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="openAddCategoryBtn">
+            <span>+</span> Add Custom Category
+          </button>
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid">
+          <!-- Dynamically populated category cards -->
+        </div>
+      </section>
+
+      <!-- Transactions Log Section -->
+      <section class="transactions-section">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Recent Expenses</h2>
+            <p style="font-size: 0.82rem; color: var(--text-muted);">Manage, search, and filter all campus transactions</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="mainAddExpenseBtn">
+            <span>+</span> Add Expense
+          </button>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filter-bar">
+          <div class="search-input-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="txSearchInput" class="form-control" placeholder="Search expenses by title or note...">
+          </div>
+          <select id="txCategoryFilter" class="filter-select">
+            <option value="">All Categories</option>
+          </select>
+          <select id="txSortFilter" class="filter-select">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="amount-desc">Highest Amount</option>
+            <option value="amount-asc">Lowest Amount</option>
+          </select>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="table-responsive">
+          <table class="tx-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Expense Details</th>
+                <th>Category</th>
+                <th>Payment Method</th>
+                <th>Amount</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+          <div id="txEmptyState" class="empty-state" style="display: none;">
+            <span>💸</span>
+            <p>No expenses found for this month and filter.</p>
+            <button class="btn btn-secondary btn-sm" id="emptyAddExpenseBtn" style="margin-top: 0.75rem;">
+              Record your first expense
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Student Budget Survival Hacks Section -->
+      <section style="margin-top: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.85rem;">🎓 Campus Money-Saving Survival Hacks</h3>
+        <div class="hacks-container">
+          <div class="hack-card">
+            <div class="hack-icon">📚</div>
+            <div class="hack-body">
+              <h4>Never Buy New Textbooks</h4>
+              <p>Check the campus library reserve, search OpenStax for open-source editions, or rent used digital copies to save \$400+/term.</p>
+            </div>
+          </div>
+          <div class="hack-card">
+            <div class="hack-icon">🍎</div>
+            <div class="hack-body">
+              <h4>Meal Prep Sundays</h4>
+              <p>Cooking large batches of chili, pasta, or curry saves up to \$250/month compared to ordering cafeteria takeout between lectures.</p>
+            </div>
+          </div>
+          <div class="hack-card">
+            <div class="hack-icon">🚌</div>
+            <div class="hack-body">
+              <h4>Use Your Student ID</h4>
+              <p>Unlock student transit passes, Spotify + Hulu discounts (\$5.99/mo), free GitHub Student Developer Pack, and 10% off local grocers.</p>
+            </div>
+          </div>
+          <div class="hack-card">
+            <div class="hack-icon">💻</div>
+            <div class="hack-body">
+              <h4>Campus Tech & Software</h4>
+              <p>Your university usually provides free Microsoft Office 365, Adobe Creative Cloud, and free on-campus high-speed printing quotas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Add / Edit Expense Modal -->
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="expenseModalTitle">
+          <span>➕</span> Add New Expense
+        </h3>
+        <button class="btn-icon" id="closeExpenseModalBtn">&times;</button>
+      </div>
+      <form id="expenseForm">
+        <div class="modal-body">
+          <input type="hidden" id="expEditId">
+          <div class="form-group">
+            <label class="form-label" for="expTitle">Expense Title / Item *</label>
+            <input type="text" id="expTitle" class="form-control" placeholder="e.g. Physics Textbook, Groceries, Burrito Bowl" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="expAmount">Amount *</label>
+              <input type="number" id="expAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="expDate">Date *</label>
+              <input type="date" id="expDate" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="expCategory">Category *</label>
+              <select id="expCategory" class="form-control" required>
+                <!-- Filled dynamically -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="expPaymentMethod">Payment Method</label>
+              <select id="expPaymentMethod" class="form-control">
+                <option value="Debit Card">Debit Card</option>
+                <option value="Campus Card">Campus ID Card</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Cash">Cash</option>
+                <option value="Digital Wallet">Digital Wallet (Apple/Google Pay/Venmo)</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="expNotes">Notes / Course / Location (Optional)</label>
+            <input type="text" id="expNotes" class="form-control" placeholder="e.g. Bookstore receipt, Split with roommate">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelExpenseModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveExpenseBtn">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Edit Category Modal -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="categoryModalTitle">
+          <span>🏷️</span> Add Category
+        </h3>
+        <button class="btn-icon" id="closeCategoryModalBtn">&times;</button>
+      </div>
+      <form id="categoryForm">
+        <div class="modal-body">
+          <input type="hidden" id="catEditId">
+          <div class="form-group">
+            <label class="form-label" for="catName">Category Name *</label>
+            <input type="text" id="catName" class="form-control" placeholder="e.g. Lab Kits & Fees, Fitness Gym, Coffee" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="catIcon">Emoji Icon</label>
+              <select id="catIcon" class="form-control">
+                <option value="🏷️">🏷️ Tag</option>
+                <option value="📚">📚 Books</option>
+                <option value="🍎">🍎 Food</option>
+                <option value="☕">☕ Cafe</option>
+                <option value="🏠">🏠 Housing</option>
+                <option value="🚌">🚌 Transit</option>
+                <option value="💻">💻 Tech</option>
+                <option value="🎮">🎮 Gaming/Fun</option>
+                <option value="🏋️">🏋️ Fitness</option>
+                <option value="👗">👗 Clothes</option>
+                <option value="🎵">🎵 Music/Stream</option>
+                <option value="🍕">🍕 Late Night Pizza</option>
+                <option value="🦺">🦺 Emergency</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="catColor">Color</label>
+              <input type="color" id="catColor" class="form-control" value="#4F46E5" style="height: 42px; padding: 4px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="catLimit">Monthly Spending Cap *</label>
+            <input type="number" id="catLimit" class="form-control" placeholder="100.00" step="5" min="5" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelCategoryModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- "Can I Afford It?" Reality Check Calculator Modal -->
+  <div class="modal-overlay" id="affordabilityModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span>🎯</span> "Can I Afford It?" Reality Check
+        </h3>
+        <button class="btn-icon" id="closeAffordabilityModalBtn">&times;</button>
+      </div>
+      <form id="affordabilityForm">
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Thinking of buying something non-essential? Let's check how many hours of campus work and daily allowances it will consume.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="affordItem">Item / Experience Name</label>
+            <input type="text" id="affordItem" class="form-control" placeholder="e.g. Concert Ticket, Designer Hoodie, Gaming Headset" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="affordPrice">Price</label>
+            <input type="number" id="affordPrice" class="form-control" placeholder="65.00" step="0.5" min="1" required>
+          </div>
+
+          <!-- Dynamic calculation result -->
+          <div id="affordResult" class="calc-result-box" style="display: none;">
+            <div class="calc-verdict" id="affordVerdictText">✅ Green Light</div>
+            <p id="affordAdviceText" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+            <div class="calc-metrics">
+              <div class="calc-metric-item">
+                <div class="calc-metric-val" id="affordWorkHours">0 hrs</div>
+                <div class="calc-metric-label">Part-Time Work Needed</div>
+              </div>
+              <div class="calc-metric-item">
+                <div class="calc-metric-val" id="affordDaysAllowance">0 days</div>
+                <div class="calc-metric-label">Daily Allowances Eaten</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelAffordabilityBtn">Close</button>
+          <button type="submit" class="btn btn-primary">Check Affordability</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile & Settings Modal -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span>⚙️</span> Student Profile & Settings
+        </h3>
+        <button class="btn-icon" id="closeProfileModalBtn">&times;</button>
+      </div>
+      <form id="profileForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="profName">Student Name</label>
+            <input type="text" id="profName" class="form-control" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="profUniversity">University / College</label>
+              <input type="text" id="profUniversity" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profMajor">Major / Year</label>
+              <input type="text" id="profMajor" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="profBudget">Monthly Target Budget</label>
+              <input type="number" id="profBudget" class="form-control" step="10" min="50" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profCurrency">Preferred Currency</label>
+              <select id="profCurrency" class="form-control">
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+                <option value="₹">₹ (INR)</option>
+                <option value="C$">C$ (CAD)</option>
+                <option value="A$">A$ (AUD)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="profWage">Part-Time Hourly Wage (for Affordability Calc)</label>
+            <input type="number" id="profWage" class="form-control" step="0.5" min="1" value="16.0">
+          </div>
+          
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <strong style="font-size: 0.85rem;">Reset Demo Data</strong>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Restore sample student expenses and categories.</p>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="resetDemoBtn">Reset Data</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/chart.min.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

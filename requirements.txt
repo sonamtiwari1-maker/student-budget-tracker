@@ -1,0 +1,6 @@
+# Core Framework & ASGI Server
+starlette>=0.30.0
+uvicorn>=0.20.0
+
+# Testing & HTTP Client
+httpx>=0.27.0
